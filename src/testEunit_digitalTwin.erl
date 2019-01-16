@@ -50,24 +50,53 @@ testPipes(N, Pipes, Connectors, Locations, Tests) when N > 1->
 	[C1,C2|RestConnectors] = Connectors,
 	[L|RestLocations] = Locations,
 
+	Flow = 3,
+	{ok, FlowInf1} = pipeInst:get_flow_influence(P),
+	Calc = -0.01 * Flow,
+
+	{ok, InstC1} = connector:get_ResInst(C1),
+	{ok, InstC2} = connector:get_ResInst(C2),
+	{ok, TypC1} = connector:get_type(C1),
+	{ok, TypC2} = connector:get_type(C2),
+
 	Test = [?_assert(erlang:is_process_alive(P)),
 	 	?_assert(erlang:is_process_alive(C1)),
 	 	?_assert(erlang:is_process_alive(C2)),
-	 	?_assert(erlang:is_process_alive(L))
+	 	?_assert(erlang:is_process_alive(L)),
+		?_assertEqual(FlowInf1(Flow), Calc),
+		?_assertEqual(InstC1, P),
+		?_assertEqual(InstC2, P),
+		?_assertEqual(TypC1, simplePipe),
+		?_assertEqual(TypC2, simplePipe)
 	       ],
+	
 	TestList = Tests ++[Test],
 	M = N-1,
 	testPipes(M, RestPipes, RestConnectors, RestLocations, TestList);
 
-testPipes(N, Pipes, Connectors, Locations, Tests) when N == 1->
+testPipes(N, Pipes, Connectors, Locations, Tests) when N == 1 ->
 	[P|_RestPipes] = Pipes,
 	[C1,C2|_RestConnectors] = Connectors,
 	[L|_RestLocations] = Locations,
 
+	Flow = 3,
+	{ok, FlowInf1} = pipeInst:get_flow_influence(P),
+	Calc = -0.01 * Flow,
+
+	{ok, InstC1} = connector:get_ResInst(C1),
+	{ok, InstC2} = connector:get_ResInst(C2),
+	{ok, TypC1} = connector:get_type(C1),
+	{ok, TypC2} = connector:get_type(C2),
+
 	Test = [?_assert(erlang:is_process_alive(P)),
 	 	?_assert(erlang:is_process_alive(C1)),
 	 	?_assert(erlang:is_process_alive(C2)),
-	 	?_assert(erlang:is_process_alive(L))
+	 	?_assert(erlang:is_process_alive(L)),
+		?_assertEqual(FlowInf1(Flow), Calc),
+		?_assertEqual(InstC1, P),
+		?_assertEqual(InstC2, P),
+		?_assertEqual(TypC1, simplePipe),
+		?_assertEqual(TypC2, simplePipe)
 	       ],
 	TestList = Tests ++[Test],
 	TestList.
@@ -135,7 +164,7 @@ testPumps(P, Pumps, Tests) when P > 1->
 	testPumps(M, RestPumps, TestList);
 
 testPumps(P, Pumps, Tests) when P == 1->
-	[PumpInst|RestPumps] = Pumps,
+	[PumpInst|_RestPumps] = Pumps,
 	AliveTests = ?_assert(erlang:is_process_alive(PumpInst)),
 	
 	{ok, InitState} = pumpInst:is_on(PumpInst),
