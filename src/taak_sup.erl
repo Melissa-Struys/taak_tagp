@@ -42,9 +42,9 @@ init([]) ->
     %test_system:test(),
     %proper:module(test_system),
 
-    %digitalTwin:start(7,3,2),
+    digitalTwin:start(7,3,2),
     %testEunit_digitalTwin:test(),
-    proper:module(testProper_digitalTwin),
+    %proper:module(testProper_digitalTwin),
     {ok, {{one_for_all, 0, 1}, []}}.
 
 %%====================================================================

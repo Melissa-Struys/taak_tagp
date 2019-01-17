@@ -35,14 +35,14 @@ test_flow(F) ->
 
 %% ------------------------------------------------------------------------- TEST HEATEXCHANGER -------------------------------------------------------------------------
 
-prop_heatEx() ->
+prop_heatExFlow() ->
 	survivor:start(),
-	Result = ?FORALL(F, integer(1,100), test_heatEx(F)),
+	Result = ?FORALL(F, integer(1,100), test_heatExFlow(F)),
 	timer:send_after(1000, survivor, stop),
 	Result.
 
 
-test_heatEx(F) ->
+test_heatExFlow(F) ->
 	{ok, {_PipeTyp_Pid, _Pipes, _Connectors, _Locations, _FluidumTyp, _FluidumInst, _PumpTyp, _Pumps, _FlowMeterTyp, _FlowMeterInst, _HeatExTyp, HeatExs}} = digitalTwin:start(3,1,1),
 	[HeatExInst|_RestHeatEx] = HeatExs,
 	
@@ -53,6 +53,28 @@ test_heatEx(F) ->
 	{ok, Influence} = TempInf(F, Temp),
 	Calc = Temp + (Diff/F),	
 	Influence == Calc.
+
+
+
+prop_heatExTemp() ->
+	survivor:start(),
+	Result = ?FORALL(T, integer(1,100), test_heatExTemp(T)),
+	timer:send_after(1000, survivor, stop),
+	Result.
+
+
+test_heatExTemp(T) ->
+	{ok, {_PipeTyp_Pid, _Pipes, _Connectors, _Locations, _FluidumTyp, _FluidumInst, _PumpTyp, _Pumps, _FlowMeterTyp, _FlowMeterInst, _HeatExTyp, HeatExs}} = digitalTwin:start(3,1,1),
+	[HeatExInst|_RestHeatEx] = HeatExs,
+	
+	Flow = 3,
+	Diff = 1,
+
+	{ok, {ok, TempInf}} = heatExchangerInst:temp_influence(HeatExInst),
+	{ok, Influence} = TempInf(Flow, T),
+	Calc = T + (Diff/Flow),	
+	Influence == Calc.
+
 
 %% ------------------------------------------------------------------------- TEST LENGTH -------------------------------------------------------------------------
 	
@@ -72,8 +94,7 @@ test_length(N) ->
 	Result = [ResultPipes, ResultConns, ResultLocs, ResultPumps, ResultHeatExs],
 	case lists:member(false, Result) of
 	    true ->
-		false
-		;
+		false;
 	    false ->
 		true
 	end.
